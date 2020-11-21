@@ -62,7 +62,7 @@ RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashr
 # Create NB_USER with name jovyan user with UID=1000 and in the 'users' group
 # and make sure these dirs are writable by the `users` group.
 RUN mkdir -p $CONDA_DIR && \
-    chmod g+w /etc/passwd && \
+    chmod g+w /etc/passwd 
 
 WORKDIR $HOME
 ARG PYTHON_VERSION=default
