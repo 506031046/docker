@@ -51,7 +51,7 @@ ENV CONDA_DIR=/opt/conda \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 ENV PATH=$CONDA_DIR/bin:$PATH \
-    HOME=/jupyter/work
+    HOME=/jupyter/mywork
 
 # Enable prompt color in the skeleton .bashrc before creating the default NB_USER
 # hadolint ignore=SC2016
@@ -68,7 +68,7 @@ WORKDIR $HOME
 ARG PYTHON_VERSION=default
 
 # Setup work directory for backward-compatibility
-RUN mkdir /jupyter/work
+RUN mkdir /jupyter/mywork
 
 # Install conda as jovyan and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION="${miniconda_version}" \
@@ -91,7 +91,7 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
     conda clean --all -f -y && \
-    rm -rf /jupyter/work/.cache/yarn
+    rm -rf /jupyter/mywork/.cache/yarn
 
 # Install Tini
 RUN conda install --quiet --yes 'tini=0.18.0' && \
@@ -112,7 +112,7 @@ RUN conda install --quiet --yes \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /jupyter/work/.cache/yarn
+    rm -rf /jupyter/mywork/.cache/yarn
 
 EXPOSE 8888
 
@@ -204,7 +204,7 @@ RUN git clone https://github.com/PAIR-code/facets.git && \
     rm -rf /tmp/facets
 
 # Import matplotlib the first time to build the font cache.
-ENV XDG_CACHE_HOME="/jupyter/work/.cache/"
+ENV XDG_CACHE_HOME="/jupyter/mywork/.cache/"
 
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot"
 
