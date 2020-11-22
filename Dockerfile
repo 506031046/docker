@@ -71,7 +71,7 @@ WORKDIR $HOME
 ARG PYTHON_VERSION=default
 
 # Setup work directory for backward-compatibility
-RUN mkdir /jupyter/work
+RUN mkdir -p /jupyter/work
 
 # Install conda as jovyan and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION="${miniconda_version}" \
