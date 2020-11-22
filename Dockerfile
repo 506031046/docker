@@ -40,7 +40,6 @@ RUN pip install --upgrade pip && \
     jupyterlab-plotly \
     @bokeh/jupyter_bokeh \
     @jupyterlab/git \
-    @mflevine/jupyterlab_html \
     jupyterlab-spreadsheet
 
 COPY bin/entrypoint.sh /usr/local/bin/
