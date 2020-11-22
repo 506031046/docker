@@ -33,14 +33,6 @@ RUN pip install --upgrade pip && \
     seaborn \
     nose \
     jupyterlab-git && \
-  jupyter labextension install \
-    @jupyterlab/latex \
-    jupyterlab-drawio \
-    jupyterlab-plotly \
-    @bokeh/jupyter_bokeh \
-    @jupyterlab/git \
-    @mflevine/jupyterlab_html \
-    jupyterlab-spreadsheet
 
 COPY bin/entrypoint.sh /usr/local/bin/
 COPY config/ /root/.jupyter/
