@@ -51,7 +51,7 @@ ENV CONDA_DIR=/opt/conda \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 ENV PATH=$CONDA_DIR/bin:$PATH \
-    HOME=/jupyter/mywork
+    HOME=/jupyter/work
 
 # Enable prompt color in the skeleton .bashrc before creating the default NB_USER
 # hadolint ignore=SC2016
@@ -61,14 +61,17 @@ RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashr
 
 # Create NB_USER with name jovyan user with UID=1000 and in the 'users' group
 # and make sure these dirs are writable by the `users` group.
-RUN mkdir -p $CONDA_DIR && \
-    chmod g+w /etc/passwd 
+RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
+    sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
+    sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers &&\
+    mkdir -p $CONDA_DIR && \
+    chmod g+w /etc/passwd
 
 WORKDIR $HOME
 ARG PYTHON_VERSION=default
 
 # Setup work directory for backward-compatibility
-RUN mkdir -p /jupyter/mywork
+RUN mkdir /jupyter/work
 
 # Install conda as jovyan and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION="${miniconda_version}" \
@@ -90,8 +93,7 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA
     conda install --quiet --yes "conda=${CONDA_VERSION}" && \
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
-    conda clean --all -f -y && \
-    rm -rf /jupyter/mywork/.cache/yarn
+    conda clean --all -f -y
 
 # Install Tini
 RUN conda install --quiet --yes 'tini=0.18.0' && \
@@ -111,8 +113,7 @@ RUN conda install --quiet --yes \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
-    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /jupyter/mywork/.cache/yarn
+    rm -rf $CONDA_DIR/share/jupyter/lab/staging
 
 EXPOSE 8888
 
@@ -124,91 +125,7 @@ CMD ["start-notebook.sh"]
 COPY start.sh start-notebook.sh start-singleuser.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
 
-WORKDIR $HOME
-
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    build-essential \
-    emacs-nox \
-    vim-tiny \
-    git \
-    inkscape \
-    jed \
-    libsm6 \
-    libxext-dev \
-    libxrender1 \
-    lmodern \
-    netcat \
-    # ---- nbconvert dependencies ----
-    texlive-xetex \
-    texlive-fonts-recommended \
-    texlive-plain-generic \
-    # ----
-    tzdata \
-    unzip \
-    nano-tiny \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN update-alternatives --install /usr/bin/nano nano /bin/nano-tiny 10
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg dvipng cm-super && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN conda install --quiet --yes \
-    'beautifulsoup4=4.9.*' \
-    'conda-forge::blas=*=openblas' \
-    'bokeh=2.2.*' \
-    'bottleneck=1.3.*' \
-    'cloudpickle=1.6.*' \
-    'cython=0.29.*' \
-    'dask=2.30.*' \
-    'dill=0.3.*' \
-    'h5py=2.10.*' \
-    'ipywidgets=7.5.*' \
-    'ipympl=0.5.*'\
-    'matplotlib-base=3.3.*' \
-    'numba=0.51.*' \
-    'numexpr=2.7.*' \
-    'pandas=1.1.*' \
-    'patsy=0.5.*' \
-    'protobuf=3.13.*' \
-    'pytables=3.6.*' \
-    'scikit-image=0.17.*' \
-    'scikit-learn=0.23.*' \
-    'scipy=1.5.*' \
-    'seaborn=0.11.*' \
-    'sqlalchemy=1.3.*' \
-    'statsmodels=0.12.*' \
-    'sympy=1.6.*' \
-    'vincent=0.4.*' \
-    'widgetsnbextension=3.5.*'\
-    'xlrd=1.2.*' \
-    && \
-    conda clean --all -f -y && \
-    # Activate ipywidgets extension in the environment that runs the notebook server
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    # Also activate ipywidgets extension for JupyterLab
-    # Check this URL for most recent compatibilities
-    # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build && \
-    jupyter labextension install @bokeh/jupyter_bokeh@^2.0.0 --no-build && \
-    jupyter labextension install jupyter-matplotlib@^0.7.2 --no-build && \
-    jupyter lab build -y && \
-    jupyter lab clean -y && \
-    npm cache clean --force
-
-# Install facets which does not have a pip or conda package at the moment
-WORKDIR /tmp
-RUN git clone https://github.com/PAIR-code/facets.git && \
-    jupyter nbextension install facets/facets-dist/ --sys-prefix && \
-    rm -rf /tmp/facets
-
-# Import matplotlib the first time to build the font cache.
-ENV XDG_CACHE_HOME="/jupyter/mywork/.cache/"
-
-RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot"
+# Fix permissions on /etc/jupyter as roo
+USER root
 
 WORKDIR $HOME
-
-RUN pip install --quiet --no-cache-dir \
-    'tensorflow==2.3.1'
