@@ -15,7 +15,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
 
 RUN pip install --upgrade pip && \
   pip install --upgrade \
-    jupyterlab==2.2.9 \
+    jupyterlab==1.2.6 \
     ipywidgets \
     jupyterlab_latex \
     plotly \
