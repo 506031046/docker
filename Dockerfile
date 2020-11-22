@@ -15,7 +15,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
 
 RUN pip install --upgrade pip && \
   pip install --upgrade \
-    jupyterlab==1.2.6 \
+    jupyterlab==2.2.9\
     ipywidgets \
     jupyterlab_latex \
     plotly \
@@ -32,7 +32,7 @@ RUN pip install --upgrade pip && \
     sympy \
     seaborn \
     nose \
-    jupyterlab-git && \
+    jupyterlab-git
 
 COPY bin/entrypoint.sh /usr/local/bin/
 COPY config/ /root/.jupyter/
