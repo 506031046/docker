@@ -34,7 +34,6 @@ RUN pip install --upgrade pip && \
     nose \
     jupyterlab-git && \
   jupyter labextension install \
-    @jupyter-widgets/jupyterlab-manager \
     @jupyterlab/latex \
     jupyterlab-drawio \
     jupyterlab-plotly \
