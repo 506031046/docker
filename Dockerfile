@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.6
 
 # 安装 Nodejs
 RUN apt update && curl -sL https://deb.nodesource.com/setup_12.x | bash - && apt install -y nodejs
