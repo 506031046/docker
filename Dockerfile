@@ -12,7 +12,6 @@ RUN apt-get update \
     sudo \
     locales \
     fonts-liberation \
-    run-one \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 安装 jupyterlab
