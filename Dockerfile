@@ -23,11 +23,20 @@ RUN pip install --quiet --no-cache-dir \
     'scipy==1.5.4' \
     'pandas==1.1.4'
 
+#安装nbdime
+RUN pip install -e git+https://github.com/jupyter/nbdime#egg=nbdime
+
 # 安装 jupyterlab 插件
 RUN jupyter labextension install @jupyterlab/git && pip install jupyterlab-git && jupyter serverextension enable --py jupyterlab_git
 
+RUN jupyter serverextension enable --py nbdime
+RUN jupyter nbextension install --py nbdime
+RUN jupyter nbextension enable --py nbdime
+RUN jupyter labextension link ./packages/nbdime --no-build
+RUN jupyter labextension install ./packages/labextension
+
 # 设置默认环境变量
-ENV NOTEBOOK_APP_TOKEN=123456
+ENV NOTEBOOK_APP_TOKEN='123456'
 ENV NOTEBOOK_DIR=/jupyter/work
 
 # 暴露端口号
