@@ -1,43 +1,20 @@
-FROM tensorflow/tensorflow:2.1.2
+FROM python:3
 
-ENV DEBIAN_FRONTEND=noninteractive
+# 安装 Nodejs
+RUN apt update && curl -sL https://deb.nodesource.com/setup_12.x | bash - && apt install -y nodejs
 
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y git
+# 安装 jupyterlab
+RUN python -m pip install jupyterlab
 
-RUN git clone --depth=1 https://github.com/Bash-it/bash-it.git ~/.bash_it && \
-  bash ~/.bash_it/install.sh --silent
+# 安装 jupyterlab 插件
+RUN jupyter labextension install @jupyterlab/git && pip install jupyterlab-git && jupyter serverextension enable --py jupyterlab_git
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-  apt-get install -y nodejs texlive-latex-extra texlive-xetex && \
-  rm -rf /var/lib/apt/lists/*
+# 设置默认环境变量
+ENV NOTEBOOK_APP_TOKEN=123456
+ENV NOTEBOOK_DIR=/jupyter/work
 
-RUN pip install --upgrade pip && \
-  pip install --upgrade \
-    jupyterlab==1.2.6\
-    ipywidgets \
-    jupyterlab_latex \
-    plotly \
-    bokeh \
-    numpy \
-    scipy \
-    numexpr \
-    patsy \
-    scikit-learn \
-    scikit-image \
-    matplotlib \
-    ipython \
-    pandas \
-    sympy \
-    seaborn \
-    nose \
-    jupyterlab-git
-
-COPY bin/entrypoint.sh /usr/local/bin/
-COPY config/ /root/.jupyter/
-
+# 暴露端口号
 EXPOSE 8888
-VOLUME /notebooks
-WORKDIR /notebooks
-ENTRYPOINT ["entrypoint.sh"]
+
+#  运行 jupyterlab
+CMD jupyter lab --ip=0.0.0.0 --no-browser --allow-root --NotebookApp.token=${NOTEBOOK_APP_TOKEN} --notebook-dir=${NOTEBOOK_DIR}
