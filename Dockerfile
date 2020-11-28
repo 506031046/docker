@@ -34,10 +34,11 @@ RUN jupyter nbextension install --py nbdime
 RUN jupyter nbextension enable --py nbdime
 RUN jupyter labextension link ./packages/nbdime --no-build
 RUN jupyter labextension install ./packages/labextension
+RUN mkdir /work
 
 # 设置默认环境变量
 ENV NOTEBOOK_APP_TOKEN='123456'
-ENV NOTEBOOK_DIR=/jupyter/work
+ENV NOTEBOOK_DIR=/work
 
 # 暴露端口号
 EXPOSE 8888
